@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.vintozver.ipv6tunnel"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk android:minSdkVersion="8" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application android:icon="@drawable/ic_launcher" android:label="@string/app_name">
+        <activity android:name=".ConfigActivity" android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".ConfigTunnelsActivity" android:label="@string/config_tunnels">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+            
+        <activity android:name=".ConfigTunnelActivity" android:label="@string/config_tunnel">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        
+		<receiver android:name=".BootHandler">
+			<intent-filter>
+				<action android:name="android.intent.action.BOOT_COMPLETED" />
+				<category android:name="android.intent.category.HOME" />
+			</intent-filter>
+		</receiver>        
+
+		<receiver android:name=".NetworkHandler">
+			<intent-filter>
+				<action android:name="android.net.ConnectivityManager.CONNECTIVITY_ACTION" />
+				<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+			</intent-filter>
+		</receiver>        
+		    
+	    <service android:name=".NetworkService" android:exported="false">
+	        <intent-filter>
+		        <action android:name=".BOOT" />
+		        <action android:name=".NETWORK_STATUS" />
+		        <action android:name=".GLOBAL_ACTIVATION" />
+		        <action android:name=".TUNNEL_CHANGE" />
+	        </intent-filter>
+		</service>
+
+	</application>
+
+</manifest>

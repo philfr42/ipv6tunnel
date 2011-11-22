@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" android:key="config_tunnel_properties" android:orderingFromXml="true" android:persistent="false">
+    <CheckBoxPreference android:summary="Activate the tunnel" android:key="active" android:title="@string/config_tunnel_active" android:persistent="false"/>
+    <PreferenceCategory android:orderingFromXml="true" android:key="addresses" android:title="@string/config_tunnel_addresses" android:summary="Tunnel Addresses" android:persistent="false">
+        <EditTextPreference android:key="remote_server" android:title="@string/config_tunnel_remote_server_v4" android:summary="Remote server IPv4 address without mask suffix" android:persistent="false"/>
+        <EditTextPreference android:key="local_client" android:title="@string/config_tunnel_local_client_v4" android:summary="Local client IPv4 address without mask suffix " android:persistent="false"/>
+        <EditTextPreference android:key="tunnel_address" android:title="@string/config_tunnel_address_v6" android:summary="Tunnel IPv6 address with mask suffix" android:persistent="false"/>
+        </PreferenceCategory>
+    <PreferenceCategory android:orderingFromXml="true" android:key="updating" android:title="@string/config_tunnel_updating" android:summary="Updating data" android:persistent="false">
+        <CheckBoxPreference android:key="updating_active" android:title="@string/config_tunnel_updating_active" android:summary="Perform client IPv4 address updates via HTTP RPC" android:persistent="false"/>
+        <EditTextPreference android:key="updating_username" android:title="@string/config_tunnel_updating_username" android:summary="User registered name for updating via HTTP RPC" android:persistent="false"/>
+        <EditTextPreference android:key="updating_password" android:title="@string/config_tunnel_updating_password" android:summary="Password for accessing the HTTP RPC" android:persistent="false"/>
+        <EditTextPreference android:key="updating_endpoint" android:title="@string/config_tunnel_updating_endpoint" android:summary="HTTP endpoint for connecting to. Should start with scheme (http or https)" android:persistent="false"/>
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:id="@+id/config_tunnel_save" android:menuCategory="container" android:title="@string/config_tunnels_save"></item>
+    <item android:id="@+id/config_tunnel_discard" android:menuCategory="container" android:title="@string/config_tunnels_discard"></item>
+    <item android:id="@+id/config_tunnel_remove" android:menuCategory="container" android:title="@string/config_tunnels_remove"></item>
+</menu>

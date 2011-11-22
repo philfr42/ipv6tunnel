@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">IPv6Tunnel</string>
+    <string name="app_service">IPv6Broker</string>
+    <string name="file_busybox">busybox</string>
+    <string name="file_ip">ip</string>
+    <string name="config_active">Active</string>
+    <string name="config_scripts_usage">Scripts Usage</string>
+    <string name="config_use_system_busybox">Use system busybox</string>
+    <string name="config_use_system_ip">Use system ip tool</string>
+    <string name="config_tunnels">Tunnels</string>
+    <string name="config_tunnel">Tunnel</string>
+    <string name="config_tunnel_active">Active</string>
+    <string name="config_tunnel_properties">Tunnel Properties</string>
+    <string name="config_tunnel_addresses">Addresses</string>
+    <string name="config_tunnel_remote_server_v4">Remote server IPv4 address</string>
+    <string name="config_tunnel_local_client_v4">Local Client IPv4 Address</string>
+    <string name="config_tunnel_address_v6">Tunnel IPv6 Address</string>
+    <string name="config_tunnel_updating">Updating</string>
+    <string name="config_tunnel_updating_active">Perform updates</string>
+    <string name="config_tunnel_updating_username">username</string>
+    <string name="config_tunnel_updating_password">password</string>
+    <string name="config_tunnel_updating_endpoint">Endpoint</string>
+    <string name="config_http_useragent">IPv6 Tunnel Service (Android)</string>
+    <string name="config_tunnels_add">Add</string>
+    <string name="config_tunnels_remove">Remove</string>
+    <string name="config_tunnels_save">Save</string>
+    <string name="config_tunnels_discard">Discard</string>
+
+    <string name="service_success">Tunnels updated.</string>
+    <string name="service_error_busybox">Error updating busybox. Error: %s</string>
+
+</resources>
