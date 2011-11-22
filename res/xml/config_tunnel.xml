@@ -4,6 +4,7 @@
     <PreferenceCategory android:orderingFromXml="true" android:key="addresses" android:title="@string/config_tunnel_addresses" android:summary="Tunnel Addresses" android:persistent="false">
         <EditTextPreference android:key="remote_server" android:title="@string/config_tunnel_remote_server_v4" android:summary="Remote server IPv4 address without mask suffix" android:persistent="false"/>
         <EditTextPreference android:key="local_client" android:title="@string/config_tunnel_local_client_v4" android:summary="Local client IPv4 address without mask suffix " android:persistent="false"/>
+        <CheckBoxPreference android:key="local_autodetect" android:title="@string/config_tunnel_local_client_autodetect" android:summary="Local client IPv4 address automatic detection " android:persistent="false"/>
         <EditTextPreference android:key="tunnel_address" android:title="@string/config_tunnel_address_v6" android:summary="Tunnel IPv6 address with mask suffix" android:persistent="false"/>
         </PreferenceCategory>
     <PreferenceCategory android:orderingFromXml="true" android:key="updating" android:title="@string/config_tunnel_updating" android:summary="Updating data" android:persistent="false">

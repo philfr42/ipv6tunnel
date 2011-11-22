@@ -38,8 +38,8 @@ public class ConfigTunnelsActivity extends PreferenceActivity {
 			if (tunnel.length() == 0) continue;
 			String remote_server = config.getString(String.format("tunnels.%s.remote_server", tunnel), "0.0.0.0");
 			String local_client = config.getString(String.format("tunnels.%s.local_client", tunnel), "0.0.0.0");
-			boolean config_updating = config.getBoolean(String.format("tunnels.%s.updating_active", tunnel), false);
-			if (config_updating) {
+			boolean config_autodetect = config.getBoolean(String.format("tunnels.%s.local_autodetect", tunnel), false);
+			if (config_autodetect) {
 				local_client = "<dynamic>";
 			}
 			String tunnel_address = config.getString(String.format("tunnels.%s.tunnel_address", tunnel), "::0/0");

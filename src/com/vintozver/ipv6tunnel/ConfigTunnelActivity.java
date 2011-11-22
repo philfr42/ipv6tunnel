@@ -37,13 +37,14 @@ public class ConfigTunnelActivity extends PreferenceActivity {
 		final boolean config_active = config.getBoolean(String.format("tunnels.%s.active", tunnel_id), false);
 		final String config_remote_server = config.getString(String.format("tunnels.%s.remote_server", tunnel_id), "");
 		final String config_local_client = config.getString(String.format("tunnels.%s.local_client", tunnel_id), "");
+		final boolean config_local_autodetect = config.getBoolean(String.format("tunnels.%s.local_autodetect", tunnel_id), false);
 		final String config_tunnel_address = config.getString(String.format("tunnels.%s.tunnel_address", tunnel_id), "");
 		final boolean config_updating_active = config.getBoolean(String.format("tunnels.%s.updating_active", tunnel_id), false);
 		final String config_updating_username = config.getString(String.format("tunnels.%s.updating_username", tunnel_id), "");
 		final String config_updating_password = config.getString(String.format("tunnels.%s.updating_password", tunnel_id), "");
 		final String config_updating_endpoint = config.getString(String.format("tunnels.%s.updating_endpoint", tunnel_id), "");
 		
-		findPreference("local_client").setEnabled(!config_updating_active);
+		findPreference("local_client").setEnabled(!config_local_autodetect);
 		findPreference("updating_username").setEnabled(config_updating_active);
 		findPreference("updating_password").setEnabled(config_updating_active);
 		findPreference("updating_endpoint").setEnabled(config_updating_active);
@@ -51,6 +52,7 @@ public class ConfigTunnelActivity extends PreferenceActivity {
 		((CheckBoxPreference)findPreference("active")).setChecked(config_active);
 		((EditTextPreference)findPreference("remote_server")).setText(config_remote_server);
 		((EditTextPreference)findPreference("local_client")).setText(config_local_client);
+		((CheckBoxPreference)findPreference("local_autodetect")).setChecked(config_local_autodetect);
 		((EditTextPreference)findPreference("tunnel_address")).setText(config_tunnel_address);
 		((CheckBoxPreference)findPreference("updating_active")).setChecked(config_updating_active);
 		((EditTextPreference)findPreference("updating_username")).setText(config_updating_username);
@@ -62,6 +64,7 @@ public class ConfigTunnelActivity extends PreferenceActivity {
 		final boolean config_active = ((CheckBoxPreference)findPreference("active")).isChecked();
 		final String config_remote_server = ((EditTextPreference)findPreference("remote_server")).getText();
 		final String config_local_client = ((EditTextPreference)findPreference("local_client")).getText();
+		final boolean config_local_autodetect = ((CheckBoxPreference)findPreference("local_autodetect")).isChecked();
 		final String config_tunnel_address = ((EditTextPreference)findPreference("tunnel_address")).getText();
 		final boolean config_updating_active = ((CheckBoxPreference)findPreference("updating_active")).isChecked();
 		final String config_updating_username = ((EditTextPreference)findPreference("updating_username")).getText();
@@ -76,6 +79,7 @@ public class ConfigTunnelActivity extends PreferenceActivity {
         config_editor.putBoolean(String.format("tunnels.%s.active", tunnel_id), config_active);
         config_editor.putString(String.format("tunnels.%s.remote_server", tunnel_id), config_remote_server);
         config_editor.putString(String.format("tunnels.%s.local_client", tunnel_id), config_local_client);
+        config_editor.putBoolean(String.format("tunnels.%s.local_autodetect", tunnel_id), config_local_autodetect);
         config_editor.putString(String.format("tunnels.%s.tunnel_address", tunnel_id), config_tunnel_address);
         config_editor.putBoolean(String.format("tunnels.%s.updating_active", tunnel_id), config_updating_active);
         config_editor.putString(String.format("tunnels.%s.updating_username", tunnel_id), config_updating_username);
@@ -108,6 +112,7 @@ public class ConfigTunnelActivity extends PreferenceActivity {
         config_editor.remove(String.format("tunnels.%s.active", tunnel_id));
         config_editor.remove(String.format("tunnels.%s.remote_server", tunnel_id));
         config_editor.remove(String.format("tunnels.%s.local_client", tunnel_id));
+        config_editor.remove(String.format("tunnels.%s.local_autodetect", tunnel_id));
         config_editor.remove(String.format("tunnels.%s.tunnel_address", tunnel_id));
         config_editor.remove(String.format("tunnels.%s.updating_active", tunnel_id));
         config_editor.remove(String.format("tunnels.%s.updating_username", tunnel_id));
@@ -147,6 +152,7 @@ public class ConfigTunnelActivity extends PreferenceActivity {
         findPreference("active").setOnPreferenceChangeListener(preference_listener);
         findPreference("remote_server").setOnPreferenceChangeListener(preference_listener);
         findPreference("local_client").setOnPreferenceChangeListener(preference_listener);
+        findPreference("local_autodetect").setOnPreferenceChangeListener(preference_listener);
         findPreference("tunnel_address").setOnPreferenceChangeListener(preference_listener);
         findPreference("updating_active").setOnPreferenceChangeListener(preference_listener);
         findPreference("updating_username").setOnPreferenceChangeListener(preference_listener);
@@ -186,12 +192,17 @@ public class ConfigTunnelActivity extends PreferenceActivity {
 		@Override
 		public boolean onPreferenceChange(Preference preference, Object newValue) {
 			getOwner().setModified();
+			if (preference.getKey().equals("local_autodetect")) {
+				final boolean config_local_autodetect = ((Boolean)newValue).booleanValue();
+				findPreference("local_client").setEnabled(!config_local_autodetect);
+				return true;
+			}
 			if (preference.getKey().equals("updating_active")) {
 				final boolean config_updating_active = ((Boolean)newValue).booleanValue();
-				findPreference("local_client").setEnabled(!config_updating_active);
 				findPreference("updating_username").setEnabled(config_updating_active);
 				findPreference("updating_password").setEnabled(config_updating_active);
 				findPreference("updating_endpoint").setEnabled(config_updating_active);
+				return true;
 			}
 			return true;
 		}

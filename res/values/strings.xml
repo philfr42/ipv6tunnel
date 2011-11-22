@@ -15,8 +15,9 @@
     <string name="config_tunnel_properties">Tunnel Properties</string>
     <string name="config_tunnel_addresses">Addresses</string>
     <string name="config_tunnel_remote_server_v4">Remote server IPv4 address</string>
-    <string name="config_tunnel_local_client_v4">Local Client IPv4 Address</string>
-    <string name="config_tunnel_address_v6">Tunnel IPv6 Address</string>
+    <string name="config_tunnel_local_client_v4">Local client IPv4 address</string>
+    <string name="config_tunnel_local_client_autodetect">Autodetect Local IPv4 address</string>
+    <string name="config_tunnel_address_v6">Tunnel IPv6 address</string>
     <string name="config_tunnel_updating">Updating</string>
     <string name="config_tunnel_updating_active">Perform updates</string>
     <string name="config_tunnel_updating_username">username</string>

@@ -137,7 +137,7 @@ public class NetworkService extends IntentService {
 		}
 	}
 
-	public String getSelfIp() throws IOException {
+	public String getExtIp() throws IOException {
 		Context context = this;
 
 		try {
@@ -169,6 +169,28 @@ public class NetworkService extends IntentService {
 			System.err.println("An error occured while retrieving self IPv4 address");
 			throw new IOException(String.format("Invalid state, %s", e.toString()));
 		}
+	}
+
+	public String getSelfIp() {
+		List<NetworkInterface> networkInterfaces = new Vector<NetworkInterface>();
+		try {
+			Enumeration<NetworkInterface> networkInterfacesEnum = NetworkInterface.getNetworkInterfaces();
+			while (networkInterfacesEnum.hasMoreElements()) {
+				NetworkInterface networkInterface = networkInterfacesEnum.nextElement();
+				if (networkInterface.getDisplayName().equals("lo")) { /* This is API version 8 hack. :( See Android documentation for further questions. */
+					continue;
+				}
+				networkInterfaces.add(networkInterface);
+				Enumeration<InetAddress> networkAddressesEnum = networkInterface.getInetAddresses();
+				while (networkAddressesEnum.hasMoreElements()) {
+					return networkAddressesEnum.nextElement().getHostAddress();
+				}
+			}
+		} catch (SocketException e) {
+			System.err.println("Cannot retrieve self IP address");
+			return null;
+		}
+		return null;
 	}
 
 	public boolean isOwnIp(String ip) {
@@ -277,7 +299,16 @@ public class NetworkService extends IntentService {
 		String interface_name = tunnelIdentifierToName(tunnel_id);
 		String remote_server = config.getString(String.format("tunnels.%s.remote_server", tunnel_id), "0.0.0.0");
 		String local_client = config.getString(String.format("tunnels.%s.local_client", tunnel_id), "0.0.0.0");
-		// boolean config_updating = config.getBoolean(String.format("tunnels.%s.updating_active", tunnel_id), false);
+		final boolean local_autodetect = config.getBoolean(String.format("tunnels.%s.local_autodetect", tunnel_id), false);
+		if (local_autodetect) {
+			String self_ip = getSelfIp();
+			if (self_ip != null) {
+				local_client = self_ip;
+			}
+		}
+		final boolean config_updating = config.getBoolean(String.format("tunnels.%s.updating_active", tunnel_id), false);
+		if (config_updating) {
+		}
 		String tunnel_address = config.getString(String.format("tunnels.%s.tunnel_address", tunnel_id), "::0/0");
 		try {
 			File tmpfile = new File(root_dir, "tunnel-cmd");
