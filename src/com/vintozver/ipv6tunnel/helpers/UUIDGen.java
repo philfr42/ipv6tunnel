@@ -1,4 +1,4 @@
-package com.vintozver.ipv6tunnel;
+package com.vintozver.ipv6tunnel.helpers;
 
 public class UUIDGen {
 	public static java.util.UUID uuidForDate(java.util.Date d)

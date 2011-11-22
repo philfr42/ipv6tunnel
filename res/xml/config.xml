@@ -2,11 +2,8 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" android:orderingFromXml="true" android:persistent="false">
     <CheckBoxPreference android:key="active" android:title="@string/config_active" android:persistent="false"/>
     <PreferenceCategory android:orderingFromXml="true" android:key="scripts_usage_category" android:summary="Scripts usage for internal operations" android:title="@string/config_scripts_usage" android:persistent="false">
-        <CheckBoxPreference android:summary='Use system busybox script for event handler invocation' android:title="@string/config_use_system_busybox" android:key="use_system_busybox" android:persistent="false"/>
-        <CheckBoxPreference android:summary='Use system ip utility for tunnel operations' android:title="@string/config_use_system_ip" android:key="use_system_ip" android:persistent="false"/>
+        <CheckBoxPreference android:summary='Use system busybox script for event handler invocation' android:title="@string/config_use_system_busybox" android:key="use_system_busybox" android:persistent="false" android:enabled="false" android:defaultValue="true" />
+        <CheckBoxPreference android:summary='Use system ip utility for tunnel operations' android:title="@string/config_use_system_ip" android:key="use_system_ip" android:persistent="false" android:enabled="false" android:defaultValue="false" />
     </PreferenceCategory>
     <Preference android:summary="Configure tunnels" android:title="@string/config_tunnels" android:key="tunnels" android:persistent="false"/>
-
-    
-
 </PreferenceScreen>

@@ -17,7 +17,13 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HttpContext;
 import android.content.Context;
 import android.content.Intent;
@@ -33,10 +39,10 @@ public class NetworkService extends IntentService {
 	public final static String TUNNEL_CHANGE = String.format("%s.TUNNEL_CHANGE", NetworkService.class.getName()); 
 
 	Handler thread_handler = null;
-	
+
 	public NetworkService() {
 		super(NetworkService.class.getName());
-		
+
 		thread_handler = new Handler();
 	}
 
@@ -57,6 +63,12 @@ public class NetworkService extends IntentService {
 		final String action = arg.getAction();
 		if (action.equals(NetworkService.BOOT) || action.equals(NetworkService.NETWORK_STATUS) || action.equals(NetworkService.GLOBAL_ACTIVATION)) {
 			tunnelsUpdate();
+			thread_handler.post(new RunnableBase<NetworkService>(this) {
+				@Override
+				public void run() {
+					Toast.makeText(getOwner(), getOwner().getString(R.string.service_success), Toast.LENGTH_LONG).show();
+				}
+			});
 			return;
 		}
 		if (action.equals(NetworkService.GLOBAL_ACTIVATION)) {
@@ -144,7 +156,7 @@ public class NetworkService extends IntentService {
 			DefaultHttpClient http_client = new DefaultHttpClient();
 			HttpRequestBase http_req = new HttpGet("http://checkip.dyndns.org/");
 			http_req.setHeader("User-Agent", context.getString(R.string.config_http_useragent));
-			HttpResponse http_data = http_client.execute(new HttpGet("http://checkip.dyndns.org/"), (HttpContext)null);
+			HttpResponse http_data = http_client.execute(http_req, (HttpContext)null);
 			HttpEntity http_entity = http_data.getEntity();
 			if (http_entity != null) {
 				InputStream http_stream = http_entity.getContent();
@@ -265,11 +277,11 @@ public class NetworkService extends IntentService {
 			throw new IOException(String.format("Command execution failure: %s", command));
 		}  		
 	}
-	
+
 	private String tunnelIdentifierToName(String tunnel_id) {
 		return String.format("sit%s", Long.toString(java.util.UUID.fromString(tunnel_id).timestamp() / 10000000, 16));
 	}
-	
+
 	private void tunnelsUpdate() {
 		Context context = this;
 
@@ -285,7 +297,7 @@ public class NetworkService extends IntentService {
 			}
 		}
 	}
-	
+
 	private void tunnelAdd(String tunnel_id) {
 		Context context = this;
 
@@ -306,9 +318,6 @@ public class NetworkService extends IntentService {
 				local_client = self_ip;
 			}
 		}
-		final boolean config_updating = config.getBoolean(String.format("tunnels.%s.updating_active", tunnel_id), false);
-		if (config_updating) {
-		}
 		String tunnel_address = config.getString(String.format("tunnels.%s.tunnel_address", tunnel_id), "::0/0");
 		try {
 			File tmpfile = new File(root_dir, "tunnel-cmd");
@@ -316,16 +325,55 @@ public class NetworkService extends IntentService {
 			tmpfile.createNewFile();
 			FileOutputStream tmpfile_ostream = new FileOutputStream(tmpfile);
 			tmpfile_ostream.write(("#!/system/bin/sh\n"
-+ String.format("%s ip tunnel add %s mode sit remote %s local %s\n", busybox_file.getAbsolutePath(), interface_name, remote_server, local_client)
-+ String.format("%s ip link set %s up\n", busybox_file.getAbsolutePath(), interface_name)
-+ String.format("%s ip addr add %s dev %s\n", busybox_file.getAbsolutePath(), tunnel_address, interface_name)
-+ String.format("%s ip route add ::/0 dev %s\n", busybox_file.getAbsolutePath(), interface_name)
-).getBytes());
+					+ String.format("%s ip tunnel add %s mode sit remote %s local %s\n", busybox_file.getAbsolutePath(), interface_name, remote_server, local_client)
+					+ String.format("%s ip link set %s up\n", busybox_file.getAbsolutePath(), interface_name)
+					+ String.format("%s ip addr add %s dev %s\n", busybox_file.getAbsolutePath(), tunnel_address, interface_name)
+					+ String.format("%s ip route add ::/0 dev %s\n", busybox_file.getAbsolutePath(), interface_name)
+					).getBytes());
 			tmpfile_ostream.flush();
 			tmpfile_ostream.close();
 			exec("chmod", "0755", tmpfile.getAbsolutePath());
 			execAsRoot(tmpfile.getAbsolutePath());
 		} catch (IOException e) {
+		}
+
+		/* Update the tunnel */
+		final boolean config_updating = config.getBoolean(String.format("tunnels.%s.updating_active", tunnel_id), false);
+		if (config_updating) {
+			final String config_updating_username = config.getString(String.format("tunnels.%s.updating_username", tunnel_id), "");
+			final String config_updating_password = config.getString(String.format("tunnels.%s.updating_password", tunnel_id), "");
+			final String config_updating_endpoint = config.getString(String.format("tunnels.%s.updating_endpoint", tunnel_id), "");
+			try {
+				SchemeRegistry schemeRegistry = new SchemeRegistry();
+				schemeRegistry.register(new Scheme("http", org.apache.http.conn.scheme.PlainSocketFactory.getSocketFactory(), 80));
+				schemeRegistry.register(new Scheme("https", new com.vintozver.ipv6tunnel.helpers.EasySSLSocketFactory(), 443));
+
+				HttpParams params = new BasicHttpParams();
+				params.setParameter(org.apache.http.conn.params.ConnManagerPNames.MAX_TOTAL_CONNECTIONS, 30);
+				params.setParameter(org.apache.http.conn.params.ConnManagerPNames.MAX_CONNECTIONS_PER_ROUTE, new org.apache.http.conn.params.ConnPerRouteBean(30));
+				params.setParameter(HttpProtocolParams.USE_EXPECT_CONTINUE, false);
+				HttpProtocolParams.setVersion(params, org.apache.http.HttpVersion.HTTP_1_1);
+
+				ClientConnectionManager cm = new org.apache.http.impl.conn.SingleClientConnManager(params, schemeRegistry);
+				DefaultHttpClient http_client = new DefaultHttpClient(cm, params);
+				HttpRequestBase http_req = new HttpGet(config_updating_endpoint);
+				http_req.setHeader("Host", "ipv4.tunnelbroker.net");
+				http_req.setHeader("User-Agent", context.getString(R.string.config_http_useragent));
+				http_req.setHeader("Authorization", "Basic " + android.util.Base64.encodeToString((config_updating_username + ":" + config_updating_password).getBytes(), android.util.Base64.DEFAULT));
+				HttpResponse http_resp = http_client.execute(http_req, (HttpContext)null);
+				HttpEntity http_entity = http_resp.getEntity();
+				if (http_entity != null) {
+					InputStream http_stream = http_entity.getContent();
+					byte[] http_content = new byte[1024]; 
+					http_stream.read(http_content);
+					System.out.printf("Tunnel update data: %s\n", new String(http_content));
+				}
+				System.out.printf("Tunnel %s updated\n", tunnel_id);
+			} catch (IOException e) {
+				System.err.println("An error occured while updating tunnel");
+			} catch (IllegalStateException e) {
+				System.err.println("An error occured while updating tunnel");
+			}
 		}
 	}
 
@@ -349,8 +397,8 @@ public class NetworkService extends IntentService {
 			tmpfile.createNewFile();
 			FileOutputStream tmpfile_ostream = new FileOutputStream(tmpfile);
 			tmpfile_ostream.write(("#!/system/bin/sh\n"
-+ String.format("%s ip tunnel del %s\n", busybox_file.getAbsolutePath(), interface_name)
-).getBytes());
+					+ String.format("%s ip tunnel del %s\n", busybox_file.getAbsolutePath(), interface_name)
+					).getBytes());
 			tmpfile_ostream.flush();
 			tmpfile_ostream.close();
 			exec("chmod", "0755", tmpfile.getAbsolutePath());

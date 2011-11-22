@@ -15,8 +15,8 @@ import android.preference.PreferenceActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuInflater;
-import com.vintozver.ipv6tunnel.UUIDGen;
 import com.vintozver.ipv6tunnel.R;
+import com.vintozver.ipv6tunnel.helpers.UUIDGen;
 
 public class ConfigTunnelActivity extends PreferenceActivity {
 	private boolean isModified = false;
